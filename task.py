@@ -72,14 +72,16 @@ for _ in range(10):
         product_id=random.choice(product_ids)
     )
 
-# Count how many times each product_id appears in the Order table
+# Count how many times each product appears in the Order table (by name)
 print("\nProduct order counts:")
 query = (Order
-         .select(Order.product_id, fn.COUNT(Order.product_id).alias('count'))
-         .group_by(Order.product_id)
-         .order_by(Order.product_id))
+         .select(Product.product, fn.COUNT(Order.product_id).alias('count'))
+         .join(Product, on=(Order.product_id == Product.product_id))
+         .group_by(Product.product)
+         .order_by(Product.product))
+
 for entry in query:
-    print(f"Product ID {entry.product_id} appears {entry.count} times")
+    print(f"Product '{entry.product.product}' appears {entry.count} times")
 
 # Example: Update the product_id for the first order to a new product_id
 if Order.select().count() > 0:
